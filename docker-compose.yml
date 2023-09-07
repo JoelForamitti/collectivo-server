@@ -69,7 +69,7 @@ services:
       PUBLIC_URL: ${DIRECTUS_URL}
 
   keycloak-db:
-    image: postgres:14-alpine
+    image: postgres:15.4-alpine
     container_name: keycloak-db
     volumes:
       - keycloak-db-data:/var/lib/postgresql/data
@@ -77,6 +77,11 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - keycloak
 
