@@ -103,6 +103,7 @@ services:
       - keycloak-db
     networks:
       - keycloak
+      - proxiable
 
 volumes:
   directus-db-data:
