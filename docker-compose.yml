@@ -6,6 +6,8 @@ networks:
     external: true
   directus:
     name: directus
+  keycloak:
+    name: keycloak
 
 services:
   directus-db:
@@ -66,5 +68,42 @@ services:
       WEBSOCKETS_ENABLED: true
       PUBLIC_URL: ${DIRECTUS_URL}
 
+  keycloak-db:
+    image: postgres:14-alpine
+    container_name: keycloak-db
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    networks:
+      - keycloak
+
+  keycloak:
+    build: ./keycloak
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_URL}
+      KEYCLOAK_IMPORT: /tmp/collectivo-realm.json
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_DB_SCHEMA: public
+      KC_DB_URL_DATABASE: "keycloak"
+      KC_DB_URL_HOST: "keycloak-db"
+      KC_DB_URL_PORT: 5432
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+    volumes:
+      - ./keycloak/import/collectivo-realm.json:/tmp/collectivo-realm.json
+      - ./keycloak/themes/collectivo:/opt/keycloak/themes/collectivo
+      - ./keycloak/imported/:/opt/keycloak/imported/
+    depends_on:
+      - keycloak-db
+    networks:
+      - keycloak
+
 volumes:
   directus-db-data:
+  keycloak-db-data:
