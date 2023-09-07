@@ -1,0 +1,70 @@
+version: "3"
+
+networks:
+  proxiable:
+    name: proxiable
+    external: true
+  directus:
+    name: directus
+
+services:
+  directus-db:
+    container_name: directus-db
+    image: postgis/postgis:15-3.4-alpine
+    volumes:
+      - directus-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: "directus"
+      POSTGRES_PASSWORD: ${DIRECTUS_DB_PASSWORD}
+      POSTGRES_DB: "directus"
+    networks:
+      - directus
+
+  directus-cache:
+    container_name: directus-cache
+    image: redis:6
+    networks:
+      - directus
+
+  directus:
+    image: directus/directus:10.6.1
+    container_name: directus
+    depends_on:
+      - directus-db
+      - directus-cache
+    expose:
+      - 8055
+    networks:
+      - proxiable
+      - directus
+    volumes:
+      - ./directus/uploads:/directus/uploads
+      - ./directus/extensions:/directus/extensions
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+
+      DB_CLIENT: "pg"
+      DB_HOST: "directus-db"
+      DB_PORT: "5432"
+      DB_DATABASE: "directus"
+      DB_USER: "directus"
+      DB_PASSWORD: ${DIRECTUS_DB_PASSWORD}
+
+      CACHE_ENABLED: "true"
+      CACHE_STORE: "redis"
+      REDIS: "redis://directus-cache:6379"
+
+      WEBSOCKETS_ENABLED: true
+      PUBLIC_URL: ${DIRECTUS_URL}
+
+volumes:
+  directus-db-data:
