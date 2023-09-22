@@ -34,7 +34,7 @@ services:
       - directus
 
   directus:
-    image: directus/directus:10.6.1
+    image: directus/directus:10.6.2
     container_name: directus
     depends_on:
       - directus-db
