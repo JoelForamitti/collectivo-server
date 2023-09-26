@@ -58,6 +58,7 @@ services:
     image: directus/directus:10.6.2
     container_name: directus
     depends_on:
+      - keycloak
       - directus-db
       - directus-cache
     expose:
@@ -115,7 +116,7 @@ services:
       - keycloak
 
   keycloak:
-    build: ./keycloak
+    image: quay.io/keycloak/keycloak:22.0.1
     container_name: keycloak
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
@@ -130,14 +131,22 @@ services:
       KC_DB_URL_PORT: 5432
       KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
     volumes:
-      - ./keycloak/import/collectivo-realm.json:/tmp/collectivo-realm.json
-      - ./keycloak/themes/collectivo:/opt/keycloak/themes/collectivo
-      - ./keycloak/imported/:/opt/keycloak/imported/
+      - ./keycloak/import:/opt/keycloak/data/import:ro
+      - ./keycloak/export:/tmp/export
+      - ./keycloak/healthcheck.sh:/healthcheck.sh
+    command: start-dev --import-realm
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8080/realms/master"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
     depends_on:
       - keycloak-db
     networks:
       - keycloak
       - proxiable
+    ports:
+      - "8080:8080"
 
 volumes:
   directus-db-data:

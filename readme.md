@@ -6,7 +6,7 @@ A test implementation for https://github.com/MILA-Wien/collectivo-directus
 
 - Create .env file with `cp .env.example .env`
 - Run `docker network create proxiable` (used by nginx in production)
-- Run `docker compose up -d`
+- Run `docker compose -f docker-compose.dev.yml up -d`
 
 ## Production system
 
