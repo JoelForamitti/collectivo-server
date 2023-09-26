@@ -1,3 +1,4 @@
 .env
 directus/uploads/*
 docker/keycloak/export
+docker/keycloak/imported/imported.flag
