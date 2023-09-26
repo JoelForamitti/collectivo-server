@@ -97,6 +97,10 @@ services:
       AUTH_KEYCLOAK_IDENTIFIER_KEY: "email"
       AUTH_KEYCLOAK_ALLOW_PUBLIC_REGISTRATION: "true"
 
+      REFRESH_TOKEN_COOKIE_DOMAIN: ${DIRECTUS_DOMAIN}
+      REFRESH_TOKEN_COOKIE_SECURE: "true"
+      REFRESH_TOKEN_COOKIE_SAME_SITE: "None"
+
   keycloak-db:
     image: postgres:15.4-alpine
     container_name: keycloak-db
