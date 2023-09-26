@@ -17,17 +17,16 @@ services:
       - directus
       - proxiable
     environment:
-      COLLECTIVO_URL: ${COLLECTIVO_URL}
-      COLLECTIVO_RUN_SETUP: "true"
-      COLLECTIVO_DEFAULT_LOCAL: "true"
+      NUXT_COLLECTIVO_RUN_SETUP: "true"
+      NUXT_DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      NUXT_DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
 
-      DIRECTUS_URL: ${DIRECTUS_URL}
-      DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
-      DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
-
-      KEYCLOAK_URL: ${KEYCLOAK_URL}
-      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
+      NUXT_PUBLIC_COLLECTIVO_URL: ${COLLECTIVO_URL}
+      NUXT_PUBLIC_COLLECTIVO_DEFAULT_LOCAL: "true"
+      NUXT_PUBLIC_DIRECTUS_URL: ${DIRECTUS_URL}
+      NUXT_PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL}
+      NUXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      NUXT_PUBLIC_KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
     depends_on:
       - keycloak
 
@@ -60,6 +59,7 @@ services:
     depends_on:
       - directus-db
       - directus-cache
+    # TODO: Can below be removed?
     expose:
       - 8055
     networks:
@@ -91,7 +91,7 @@ services:
 
       AUTH_PROVIDERS: "keycloak"
       AUTH_KEYCLOAK_DRIVER: "openid"
-      AUTH_KEYCLOAK_CLIENT_ID: "directus"
+      AUTH_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_DIRECTUS_CLIENT}
       AUTH_KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_DIRECTUS_SECRET}
       AUTH_KEYCLOAK_ISSUER_URL: "${KEYCLOAK_URL}/realms/collectivo/.well-known/openid-configuration"
       AUTH_KEYCLOAK_IDENTIFIER_KEY: "email"

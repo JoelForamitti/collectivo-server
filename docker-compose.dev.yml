@@ -1,35 +1,24 @@
 version: "3"
 
-networks:
-  proxiable:
-    name: proxiable
-    external: true
-  directus:
-    name: directus
-  keycloak:
-    name: keycloak
-
 services:
   collectivo:
     container_name: collectivo
     build: ./collectivo
-    networks:
-      - directus
-      - proxiable
     environment:
-      COLLECTIVO_URL: ${COLLECTIVO_URL}
-      COLLECTIVO_RUN_SETUP: "true"
-      COLLECTIVO_DEFAULT_LOCAL: "true"
+      NUXT_COLLECTIVO_RUN_SETUP: "true"
+      NUXT_DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      NUXT_DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
 
-      DIRECTUS_URL: ${DIRECTUS_URL}
-      DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
-      DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
-
-      KEYCLOAK_URL: ${KEYCLOAK_URL}
-      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
+      NUXT_PUBLIC_COLLECTIVO_URL: ${COLLECTIVO_URL}
+      NUXT_PUBLIC_COLLECTIVO_DEFAULT_LOCAL: "true"
+      NUXT_PUBLIC_DIRECTUS_URL: ${DIRECTUS_URL}
+      NUXT_PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL}
+      NUXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      NUXT_PUBLIC_KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
     depends_on:
       - keycloak
+    ports:
+      - "3000:3000"
 
   directus-db:
     container_name: directus-db
@@ -45,14 +34,10 @@ services:
       POSTGRES_USER: "directus"
       POSTGRES_PASSWORD: ${DIRECTUS_DB_PASSWORD}
       POSTGRES_DB: "directus"
-    networks:
-      - directus
 
   directus-cache:
     container_name: directus-cache
     image: redis:6
-    networks:
-      - directus
 
   directus:
     image: directus/directus:10.6.2
@@ -61,11 +46,10 @@ services:
       - keycloak
       - directus-db
       - directus-cache
-    expose:
-      - 8055
-    networks:
-      - proxiable
-      - directus
+    ports:
+      - "8055:8055"
+    links:
+      - keycloak
     volumes:
       - ./directus/uploads:/directus/uploads
       - ./directus/extensions:/directus/extensions
@@ -92,7 +76,7 @@ services:
 
       AUTH_PROVIDERS: "keycloak"
       AUTH_KEYCLOAK_DRIVER: "openid"
-      AUTH_KEYCLOAK_CLIENT_ID: "directus"
+      AUTH_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_DIRECTUS_CLIENT}
       AUTH_KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_DIRECTUS_SECRET}
       AUTH_KEYCLOAK_ISSUER_URL: "${KEYCLOAK_URL}/realms/collectivo/.well-known/openid-configuration"
       AUTH_KEYCLOAK_IDENTIFIER_KEY: "email"
@@ -112,8 +96,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - keycloak
 
   keycloak:
     image: quay.io/keycloak/keycloak:22.0.1
@@ -142,9 +124,6 @@ services:
       retries: 15
     depends_on:
       - keycloak-db
-    networks:
-      - keycloak
-      - proxiable
     ports:
       - "8080:8080"
 

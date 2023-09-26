@@ -3,4 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   extends: ["@collectivo/core", "@collectivo/members"],
+  runtimeConfig: {
+    public: {},
+  },
 });
