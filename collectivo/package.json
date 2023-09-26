@@ -10,8 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@collectivo/core": "latest",
-    "@collectivo/members": "latest"
+    "@collectivo/core": "^0.0.6",
+    "@collectivo/members": "^0.0.2"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
