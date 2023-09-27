@@ -82,6 +82,9 @@ services:
       AUTH_KEYCLOAK_IDENTIFIER_KEY: "email"
       AUTH_KEYCLOAK_ALLOW_PUBLIC_REGISTRATION: "true"
 
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+
   keycloak-db:
     image: postgres:15.4-alpine
     container_name: keycloak-db

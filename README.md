@@ -5,12 +5,12 @@ A test implementation for https://github.com/MILA-Wien/collectivo-directus
 ## Local development
 
 - Create .env file with `cp .env.example .env`
-- Run `docker network create proxiable` (used by nginx in production)
+- Run `docker compose -f docker-compose.dev.yml build collectivo --no-cache`
 - Run `docker compose -f docker-compose.dev.yml up -d`
 
 ## Production system
 
-Set up a reverse proxy (e.g. with https://www.linode.com/docs/guides/using-nginx-proxy-manager/)
+Set up a reverse proxy with a docker network called `proxiable` (e.g. with https://www.linode.com/docs/guides/using-nginx-proxy-manager/)
 
 Nginx for Keycloak needs (https://stackoverflow.com/questions/56126864)
 ```
