@@ -5,18 +5,18 @@ services:
     container_name: collectivo
     build: ./collectivo
     environment:
-      NUXT_COLLECTIVO_RUN_SETUP: "true"
+      NUXT_RUN_MIGRATIONS: "true"
       NUXT_DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
       NUXT_DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
-
       NUXT_PUBLIC_COLLECTIVO_URL: ${COLLECTIVO_URL}
-      NUXT_PUBLIC_COLLECTIVO_DEFAULT_LOCAL: "true"
+      NUXT_PUBLIC_DEFAULT_LOCAL: ${COLLECTIVO_DEFAULT_LOCAL}
       NUXT_PUBLIC_DIRECTUS_URL: ${DIRECTUS_URL}
       NUXT_PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL}
       NUXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       NUXT_PUBLIC_KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
     depends_on:
       - keycloak
+      - directus
     ports:
       - "3000:3000"
 
@@ -24,7 +24,7 @@ services:
     container_name: directus-db
     image: postgis/postgis:15-3.4-alpine
     volumes:
-      - directus-db-data:/var/lib/postgresql/data
+      - collectivo-server-dev-directus-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
@@ -82,14 +82,14 @@ services:
       AUTH_KEYCLOAK_IDENTIFIER_KEY: "email"
       AUTH_KEYCLOAK_ALLOW_PUBLIC_REGISTRATION: "true"
 
-      CORS_ENABLED: "true"
-      CORS_ORIGIN: "true"
+      # CORS_ENABLED: "true"
+      # CORS_ORIGIN: "true"
 
   keycloak-db:
     image: postgres:15.4-alpine
     container_name: keycloak-db
     volumes:
-      - keycloak-db-data:/var/lib/postgresql/data
+      - collectivo-server-dev-keycloak-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -131,5 +131,5 @@ services:
       - "8080:8080"
 
 volumes:
-  directus-db-data:
-  keycloak-db-data:
+  collectivo-server-dev-directus-db-data:
+  collectivo-server-dev-keycloak-db-data:
