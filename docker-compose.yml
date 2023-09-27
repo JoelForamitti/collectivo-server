@@ -99,7 +99,9 @@ services:
 
       REFRESH_TOKEN_COOKIE_DOMAIN: ${DIRECTUS_DOMAIN}
       REFRESH_TOKEN_COOKIE_SECURE: "true"
-      REFRESH_TOKEN_COOKIE_SAME_SITE: "None"
+      REFRESH_TOKEN_COOKIE_SAME_SITE: "lax"
+
+      CORS_ORIGIN: "[${DIRECTUS_URL}, ${COLLECTIVO_URL}]"
 
   keycloak-db:
     image: postgres:15.4-alpine
