@@ -4,6 +4,7 @@ A test implementation for https://github.com/MILA-Wien/collectivo-directus
 
 ## Local development
 
+- Clone this repository on your local system
 - Create .env file with `cp .env.example .env`
 - Run `docker compose -f docker-compose.dev.yml build collectivo --no-cache`
 - Run `docker compose -f docker-compose.dev.yml up -d`
@@ -18,3 +19,7 @@ proxy_buffer_size   128k;
 proxy_buffers   4 256k;
 proxy_busy_buffers_size   256k;
 ```
+
+
+- Clone this repository on your server
+- Run `docker compose build collectivo --no-cache`
