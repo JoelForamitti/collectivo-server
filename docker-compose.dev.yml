@@ -16,6 +16,7 @@ services:
       NUXT_PUBLIC_KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
     depends_on:
       - keycloak
+        # condition: service_healthy
       - directus
     ports:
       - "3000:3000"
@@ -44,6 +45,7 @@ services:
     container_name: directus
     depends_on:
       - keycloak
+        # condition: service_healthy
       - directus-db
       - directus-cache
     ports:
