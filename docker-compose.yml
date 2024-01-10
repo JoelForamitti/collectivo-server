@@ -85,9 +85,9 @@ services:
       DB_USER: "directus"
       DB_PASSWORD: ${DIRECTUS_DB_PASSWORD}
 
-      CACHE_ENABLED: "true"
-      CACHE_STORE: "redis"
-      REDIS: "redis://directus-cache:6379"
+      # CACHE_ENABLED: "true"
+      # CACHE_STORE: "redis"
+      # REDIS: "redis://directus-cache:6379"
 
       WEBSOCKETS_ENABLED: true
       PUBLIC_URL: ${DIRECTUS_URL}
@@ -147,7 +147,7 @@ services:
       - ./keycloak/export:/tmp/export
     command: start-dev --import-realm --health-enabled true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      test: ["CMD", "curl", "-f", "${KEYCLOAK_URL}/health/ready"]
       interval: 5s
       timeout: 5s
       retries: 20
