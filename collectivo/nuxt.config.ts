@@ -2,8 +2,22 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
-  extends: ["@collectivo/collectivo", "@collectivo/coop"],
-  runtimeConfig: {
-    public: {},
+  extends: [
+    "@collectivo/collectivo",
+    "@collectivo/payments",
+    "@collectivo/memberships",
+  ],
+  i18n: {
+    lazy: true,
+    langDir: "./lang",
+    locales: [
+      { code: "en", file: "en.json" },
+      { code: "de", file: "de.json" },
+    ],
+  },
+  vite: {
+    optimizeDeps: {
+      include: ["yup"],
+    },
   },
 });

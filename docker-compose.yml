@@ -20,6 +20,8 @@ services:
       NUXT_API_TOKEN: ${COLLECTIVO_API_TOKEN}
       NUXT_DIRECTUS_ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
       NUXT_DIRECTUS_ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      NUXT_KEYCLOAK_ADMIN_CLIENT: ${KEYCLOAK_ADMIN_CLIENT}
+      NUXT_KEYCLOAK_ADMIN_SECRET: ${KEYCLOAK_ADMIN_SECRET}
       NUXT_PUBLIC_COLLECTIVO_URL: ${COLLECTIVO_URL}
       NUXT_PUBLIC_DEFAULT_LOCAL: ${COLLECTIVO_DEFAULT_LOCAL}
       NUXT_PUBLIC_DIRECTUS_URL: ${DIRECTUS_URL}
@@ -27,7 +29,10 @@ services:
       NUXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       NUXT_PUBLIC_KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
     depends_on:
-      - keycloak
+      keycloak:
+        condition: service_healthy
+      directus-db:
+        condition: service_healthy
 
   directus-db:
     container_name: directus-db
@@ -53,7 +58,7 @@ services:
       - directus
 
   directus:
-    image: directus/directus:10.6.2
+    image: directus/directus:10.8.3
     container_name: directus
     depends_on:
       - directus-db
@@ -122,7 +127,9 @@ services:
       - keycloak
 
   keycloak:
-    build: ./keycloak
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
     container_name: keycloak
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
@@ -137,9 +144,13 @@ services:
       KC_DB_URL_PORT: 5432
       KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
     volumes:
-      - ./keycloak/import/collectivo-realm.json:/tmp/collectivo-realm.json
-      - ./keycloak/themes/collectivo:/opt/keycloak/themes/collectivo
-      - ./keycloak/imported/:/opt/keycloak/imported/
+      - ./keycloak/import:/opt/keycloak/data/import:ro
+      - ./keycloak/export:/tmp/export
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     depends_on:
       - keycloak-db
     networks:
