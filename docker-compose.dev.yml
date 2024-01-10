@@ -117,7 +117,7 @@ services:
 
   keycloak:
     build:
-      context: ./keycloak
+      context: ./keycloak-dev
       dockerfile: Dockerfile
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
