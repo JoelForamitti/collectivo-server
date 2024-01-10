@@ -145,7 +145,7 @@ services:
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import:ro
       - ./keycloak/export:/tmp/export
-    command: start-dev --import-realm --health-enabled true
+    command: start --optimized --health-enabled true
     healthcheck:
       test: ["CMD", "curl", "-f", "${KEYCLOAK_URL}/health/ready"]
       interval: 5s
