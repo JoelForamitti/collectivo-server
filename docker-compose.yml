@@ -27,7 +27,6 @@ services:
       NUXT_PUBLIC_DIRECTUS_URL: ${DIRECTUS_URL}
       NUXT_PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL}
       NUXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      NUXT_PUBLIC_KEYCLOAK_CLIENT: ${KEYCLOAK_CLIENT}
     depends_on:
       keycloak:
         condition: service_healthy
@@ -146,6 +145,7 @@ services:
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import:ro
       - ./keycloak/export:/tmp/export
+    command: start-dev --import-realm --health-enabled true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
       interval: 5s
