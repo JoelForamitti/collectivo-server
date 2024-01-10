@@ -27,11 +27,6 @@ services:
       NUXT_PUBLIC_DIRECTUS_URL: ${DIRECTUS_URL}
       NUXT_PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL}
       NUXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-    depends_on:
-      keycloak:
-        condition: service_healthy
-      directus-db:
-        condition: service_healthy
 
   directus-db:
     container_name: directus-db
@@ -145,12 +140,7 @@ services:
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import:ro
       - ./keycloak/export:/tmp/export
-    command: start --optimized --health-enabled true
-    healthcheck:
-      test: ["CMD", "curl", "-f", "${KEYCLOAK_URL}/health/ready"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+    command: start --optimized
     depends_on:
       - keycloak-db
     networks:
