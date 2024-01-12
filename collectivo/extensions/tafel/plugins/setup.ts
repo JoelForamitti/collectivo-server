@@ -5,7 +5,7 @@ export default defineNuxtPlugin(() => {
 
   const items: CollectivoMenuItem[] = [
     {
-      label: "Events",
+      label: "Termine",
       icon: "i-system-uicons-calendar-month",
       to: "/tafel/events",
       order: 99,

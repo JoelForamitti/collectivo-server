@@ -24,7 +24,17 @@ async function loadEvents() {
   console.log("user ID", user.value.data?.id);
 
   events.value = (await directus.request(
-    readItems("tafel_events", {}),
+    readItems("tafel_events", {
+      filter: {
+        tafel_users_registered: {
+          _none: {
+            directus_users_id: {
+              _eq: user.value.data?.id,
+            },
+          },
+        },
+      },
+    }),
   )) as any[];
 
   console.log("events", events.value);

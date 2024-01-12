@@ -3,7 +3,7 @@
 <script setup lang="ts">
 import { readItem, readItems, deleteItem } from "@directus/sdk";
 
-setCollectivoTitle("Meine Termine");
+setCollectivoTitle("Tafel Termine");
 const calendarIsOpen = ref(false);
 const eventIsOpen = ref(false);
 const directus = useDirectus();
@@ -67,8 +67,7 @@ async function cancelEvent(eventId: number) {
 
 <template>
   <CollectivoContainer>
-    <h3>Demo für Wiener Tafel</h3>
-    <p>Beschreibungstext für die Termine der Tafel</p>
+    <p>Demo für Tafel Termin System</p>
     <UButton
       label="Neue Termine aussuchen"
       icon="i-mi-circle-add"
@@ -77,19 +76,22 @@ async function cancelEvent(eventId: number) {
       @click="navigateTo('/tafel/calendar')"
     />
   </CollectivoContainer>
-  <div v-for="(event, i) in events" :key="i" class="mb-5">
-    <CollectivoCard>
-      <template #content>
-        <h4>{{ event.tafel_date }} - Angemeldet</h4>
-        <p>Beschreibungstext für den Termin</p>
-        <UButton
-          label="Teilnahme absagen"
-          color="red"
-          class="mt-5"
-          size="md"
-          @click="cancelEvent(event.id)"
-        />
-      </template>
-    </CollectivoCard>
+  <div v-if="events.length > 0">
+    <h1 class="my-5">Meine Termine</h1>
+    <div v-for="(event, i) in events" :key="i" class="mb-5">
+      <CollectivoCard>
+        <template #content>
+          <h4>{{ event.tafel_date }} - Angemeldet</h4>
+          <p>Beschreibungstext für den Termin</p>
+          <UButton
+            label="Teilnahme absagen"
+            color="red"
+            class="mt-2"
+            size="md"
+            @click="cancelEvent(event.id)"
+          />
+        </template>
+      </CollectivoCard>
+    </div>
   </div>
 </template>
