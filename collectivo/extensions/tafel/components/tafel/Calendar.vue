@@ -1,12 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { createItem } from "@directus/sdk";
 
-const viewType = ref("");
-const innerWidth = ref("");
+const user = useCollectivoUser();
+
+const props = defineProps({
+  events: {
+    type: Array as PropType<any[]>,
+    required: true,
+  },
+});
+
+const eventList: any[] = [];
+
+for (let i = 0; i < props.events.length; i++) {
+  eventList.push({
+    id: props.events[i].id,
+    title: "Ein Termin",
+    eventId: props.events[i].id,
+    start: props.events[i].tafel_date,
+  });
+}
 
 const calendarOptions = ref({
   plugins: [dayGridPlugin, listPlugin, timeGridPlugin, interactionPlugin],
@@ -19,97 +37,46 @@ const calendarOptions = ref({
       dayMaxEventRows: 2,
     },
   },
-  events: [
-    {
-      id: 1,
-      title: "Team Meeting",
-      start: "2024-01-08",
-    },
-    {
-      id: 2,
-      title: "Marketing strategy",
-      start: "2024-01-08",
-    },
-    {
-      id: 3,
-      title: "Web development",
-      start: "2024-01-15",
-      backgroundColor: "#FFF7E3",
-      textColor: "#D36D29",
-    },
-    {
-      id: 4,
-      title: "Team Meeting",
-      start: "2024-01-15",
-      textColor: "#D36D29",
-      backgroundColor: "#FFF7E3",
-    },
-    {
-      id: 5,
-      title: "Public relation",
-      start: "2024-01-11",
-      backgroundColor: "#EAFFF8",
-      textColor: "#2CB3A5",
-    },
-    {
-      id: 6,
-      title: "Team Meeting",
-      start: "2024-01-11",
-      backgroundColor: "#EAFFF8",
-      textColor: "#2CB3A5",
-    },
-
-    {
-      id: 7,
-      title: "Team Meeting",
-      start: "2024-01-21",
-    },
-    {
-      id: 8,
-      title: "Marketing strategy",
-      start: "2024-01-21",
-    },
-    {
-      id: 9,
-      title: "Team Meeting",
-      start: "2024-01-20",
-      backgroundColor: "#EAFFF8",
-      textColor: "#2CB3A5",
-    },
-    {
-      id: 10,
-      title: "Marketing strategy",
-      start: "2024-01-12",
-      backgroundColor: "#EAFFF8",
-      textColor: "#2CB3A5",
-    },
-  ],
+  events: eventList,
+  eventClick: function (info: any) {
+    console.log("eventClick", info);
+    console.log("eventClick", info.event.title);
+    openEvent(info.event);
+  },
 });
 
+function openEvent(event: any) {
+  selectedEvent.value = event;
+  eventIsOpen.value = true;
+}
+
+const directus = useDirectus();
+
+async function registerForEvent(selectedEvent: any) {
+  console.log("registerForEvent", selectedEvent);
+  console.log("registerForEvent", selectedEvent.extendedProps.eventId);
+
+  await user.value.load();
+  console.log("user ID", user.value.data?.id);
+
+  const relationID = await directus.request(
+    createItem("tafel_events_directus_users", {
+      tafel_events_id: selectedEvent.extendedProps.eventId,
+      directus_users_id: user.value.data?.id,
+    }),
+  );
+
+  console.log("relation ID", relationID);
+
+  navigateTo("/tafel/events");
+}
+
+const selectedEvent: Ref<any> = ref();
+const eventIsOpen = ref(false);
 const calendarRef = ref(null);
 
 const calendarComputed = () => {
   return calendarRef;
-};
-
-onMounted(() => {
-  resize();
-  window.addEventListener("resize", resize);
-});
-
-const resize = async () => {
-  const deviceWidth = window.matchMedia("(max-width: 767px)");
-  const calendar = await calendarRef.value.getApi();
-
-  if (deviceWidth.matches) {
-    innerWidth.value = `${window.innerWidth}px`;
-    calendar.changeView("listWeek");
-    calendar.setHeight(585);
-    viewType.value = "listWeek";
-  } else {
-    calendar.changeView("dayGridMonth");
-    viewType.value = "";
-  }
 };
 </script>
 
@@ -117,15 +84,20 @@ const resize = async () => {
   <div id="tafel-calendar" class="calendar">
     <TafelCalendarHeader :calendar-ref="calendarComputed()" />
     <full-calendar ref="calendarRef" :options="calendarOptions">
-      <template #eventContent="arg">
-        <div
-          :class="viewType === 'listWeek' ? 'list-week-view' : 'day-grid-view'"
-        >
-          {{ arg.event.title }}
-        </div>
-      </template>
+      <template #> </template>
     </full-calendar>
   </div>
+  <UModal v-model="eventIsOpen">
+    <div class="m-10">
+      <h3>Ein Termin</h3>
+      <p>{{ selectedEvent?.start }}</p>
+      <p>Beschreibung des Termins</p>
+      <UButton
+        label="Termin anmelden"
+        @click="registerForEvent(selectedEvent)"
+      />
+    </div>
+  </UModal>
 </template>
 
 <style lang="scss">
